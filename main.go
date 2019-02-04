@@ -92,11 +92,6 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error opening %s: %s\n", subpath, err)
 			return nil
 		}
-		statinfo, err := file.Stat()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading stats %s: %s\n", subpath, err)
-			return nil
-		}
 		hasher := sha1.New()
 		fileBytes := make([]byte, 1024*1024)
 		contentType := ""
@@ -140,7 +135,6 @@ func main() {
 			"etag":         fmt.Sprintf("${md5(file(%q))}", subpath),
 			"content_type": contentType,
 			"cache_control": "max-age=86400, stale-while-revalidate=3600",
-			"last_modified": statinfo.ModTime().Format(http.TimeFormat),
 		}
 
 		return nil
