@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"os"
-	"path/filepath"
 	"path"
+	"path/filepath"
 	"strings"
-	"mime"
 
 	getopt "github.com/pborman/getopt"
 )
@@ -108,14 +108,14 @@ func main() {
 			// If we start to need a set of overrides for DetectContentType
 			// then we need to find a different way to do this.
 			contentType = "image/svg+xml"
-		// } else if strings.HasSuffix(relPath, ".css") {
-		// 	// If we start to need a set of overrides for DetectContentType
-		// 	// then we need to find a different way to do this.
-		// 	contentType = "text/css"
-		// } else if strings.HasSuffix(relPath, ".js") {
-		// 	// If we start to need a set of overrides for DetectContentType
-		// 	// then we need to find a different way to do this.
-		// 	contentType = "application/javascript"
+			// } else if strings.HasSuffix(relPath, ".css") {
+			// 	// If we start to need a set of overrides for DetectContentType
+			// 	// then we need to find a different way to do this.
+			// 	contentType = "text/css"
+			// } else if strings.HasSuffix(relPath, ".js") {
+			// 	// If we start to need a set of overrides for DetectContentType
+			// 	// then we need to find a different way to do this.
+			// 	contentType = "application/javascript"
 		} else if mimetype := mime.TypeByExtension(path.Ext(subpath)); mimetype != "" {
 			contentType = mimetype
 		} else {
@@ -126,14 +126,14 @@ func main() {
 		// for a given file subpath as long as the relative subpath to the target
 		// directory is always the same across runs.
 		hasher.Write([]byte(relPath))
-		resourceName := fmt.Sprintf("%x", hasher.Sum(nil))
+		resourceName := fmt.Sprintf("_%x", hasher.Sum(nil))
 
 		resourcesMap[resourceName] = map[string]interface{}{
-			"bucket":       bucketName,
-			"key":          relPath,
-			"source":       subpath,
-			"etag":         fmt.Sprintf("${md5(file(%q))}", subpath),
-			"content_type": contentType,
+			"bucket":        bucketName,
+			"key":           relPath,
+			"source":        subpath,
+			"etag":          fmt.Sprintf("${filemd5(%q)}", subpath),
+			"content_type":  contentType,
 			"cache_control": "max-age=86400, stale-while-revalidate=3600",
 		}
 
